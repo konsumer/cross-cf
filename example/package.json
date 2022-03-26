@@ -1,0 +1,18 @@
+{
+  "name": "do-example",
+  "private": true,
+  "version": "0.0.0",
+  "description": "This is an example worker/DO project that you can use with the remote-DO stuff.",
+  "main": "worker.js",
+  "scripts": {
+    "build": "npx -y esbuild --outfile=worker.js src/worker.js",
+    "deploy": "npx -y @cloudflare/wrangler deploy",
+    "start": "npx -y @cloudflare/wrangler dev"
+  },
+  "keywords": [],
+  "author": "David Konsumer <konsumer@jetboystudio.com> (http://konsumer.js.org/)",
+  "license": "MIT",
+  "dependencies": {
+    "@cloudflare/wrangler": "^1.19.11"
+  }
+}

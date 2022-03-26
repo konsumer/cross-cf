@@ -1,0 +1,12 @@
+name = 'do-example'
+account_id = '3ed2457d27afff741ff0aef6c76365fa'
+workers_dev = true
+
+[[kv_namespaces]]
+binding = 'MYDB'
+id = '0caac01eaf724a108c78075288ceddc2'
+preview_id = '0caac01eaf724a108c78075288ceddc2'
+
+[[durable_objects.bindings]]
+name = 'POKEMON'
+class_name = 'PokemonDurableObject'

@@ -1,0 +1,48 @@
+{
+  "name": "cross-cf",
+  "version": "0.0.0",
+  "description": "Cross-environment DO and KV access",
+  "type": "module",
+  "source": "cross-cf.js",
+  "exports": {
+    "require": "./dist/cross-cf.cjs",
+    "default": "./dist/cross-cf.modern.js"
+  },
+  "main": "./dist/cross-cf.cjs",
+  "module": "./dist/cross-cf.module.js",
+  "unpkg": "./dist/cross-cf.umd.js",
+  "scripts": {
+    "build": "npx -y microbundle",
+    "pretest": "npx -y esbuild --bundle --platform=node --format=cjs --outfile=./dist/test.js test.js",
+    "test": "npx -y jest --verbose=true ./dist/test.js",
+    "integration": "TEST_MODE=integration npm run test",
+    "prePublishOnly": "npm run build"
+  },
+  "keywords": [
+    "cloudflare",
+    "kv",
+    "miniflare",
+    "durable",
+    "object"
+  ],
+  "author": "David Konsumer <konsumer@jetboystudio.com>",
+  "license": "MIT",
+  "dependencies": {
+    "@miniflare/kv": "^2.3.0",
+    "@miniflare/storage-file": "^2.3.0",
+    "cross-fetch": "^3.1.5"
+  },
+  "files": [
+    "dist/cross-cf.cjs",
+    "dist/cross-cf.cjs.map",
+    "dist/cross-cf.modern.js",
+    "dist/cross-cf.modern.js.map",
+    "dist/cross-cf.module.js",
+    "dist/cross-cf.module.js.map",
+    "dist/cross-cf.umd.js",
+    "dist/cross-cf.umd.js.map"
+  ],
+  "devDependencies": {
+    "wrangler": "^0.0.4"
+  }
+}
