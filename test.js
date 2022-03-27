@@ -7,49 +7,81 @@ import realFetch from 'cross-fetch'
 const testKV = '0caac01eaf724a108c78075288ceddc2'
 
 // this illustrates how you can hit a real service for integration-tests, or mock for fast network-free unit-tests
+// my remote KV integration test is using a local CrossKV
 if (process.env.TEST_MODE !== 'integration') {
+  const TESTDB = new CrossKV('TESTDB', { target: 'local' })
+
   global.fetch = jest.fn(async (url, options) => {
-    return {
-      status: 200,
-
-      // only get-text asks for this
-      async text () {
-        return JSON.stringify({ test: true })
-      },
-
-      // json() could be get/getWithMetadata/list
-      async json () {
+    switch (options.method) {
+      case 'GET':
         // meta
         if (url.endsWith('/metadata/TEST')) {
-          return { result: null, success: true, errors: [], messages: [] }
-        }
+          return {
+            status: 200,
+            json: async () => ({
+              result: null,
+              success: true,
+              errors: [],
+              messages: []
+            })
+          }
 
         // list
-        if (url.endsWith('/keys?')) {
+        } else if (url.endsWith('/keys?')) {
+          const result = (await TESTDB.list()).keys
           return {
-            result: [{ name: 'TEST' }],
-            success: true,
-            errors: [],
-            messages: [],
-            result_info: { count: 1, cursor: '' }
+            status: 200,
+            json: async () => ({
+              result,
+              success: true,
+              errors: [],
+              messages: [],
+              result_info: { count: result.length, cursor: '' }
+            })
           }
-        }
 
         // get
-        return { test: true }
-      },
-
-      // these don't have tests yet
-      async arrayBuffer () {},
-
-      body: {
-        getReader () {}
-      }
+        } else {
+          return {
+            status: 200,
+            json: async () => JSON.parse(await TESTDB.get('TEST')),
+            text: async () => await TESTDB.get('TEST')
+          }
+        }
+      case 'PUT':
+        if (url.endsWith('/values/TEST?')) {
+          await TESTDB.put('TEST', options.body)
+          return {
+            status: 200,
+            json: async () => ({})
+          }
+        } else if (url.endsWith('bulk?')) {
+          await TESTDB.bulkput(JSON.parse(options.body))
+          return {
+            status: 200,
+            json: async () => ({})
+          }
+        }
+        break
+      case 'DELETE':
+        if (url.endsWith('/values/TEST?')) {
+          await TESTDB.delete('TEST')
+          return {
+            status: 200,
+            json: async () => ({})
+          }
+        } else if (url.endsWith('bulk?')) {
+          await TESTDB.bulkdelete(JSON.parse(options.body))
+          return {
+            status: 200,
+            json: async () => ({})
+          }
+        }
+        break
     }
   })
-  process.env.CF_TOKEN = 'XXX_TOKEN'
-  process.env.CF_ACCOUNTID = 'XXX_ACCOUNT'
 } else {
+  // just wrap the real fetch, so I can see how it was called
   global.fetch = jest.fn(realFetch)
 }
 
@@ -84,59 +116,64 @@ describe('CrossKV', () => {
 
     test('getWithMetadata', async () => {
       const r = await MYDB.getWithMetadata('TEST', { type: 'json' })
+      expect(global.fetch).toHaveBeenCalledTimes(0)
       expect(r.value).toEqual({ test: true })
       expect(r.metadata).toBe(null)
     })
 
     test('list', async () => {
       const r = await MYDB.list()
+      expect(global.fetch).toHaveBeenCalledTimes(0)
       expect(r.keys.length).toBe(1)
       expect(r.keys[0].name).toBe('TEST')
     })
 
     test('delete', async () => {
       await MYDB.delete('TEST')
+      expect(global.fetch).toHaveBeenCalledTimes(0)
       const r = await MYDB.list()
       expect(r.keys.length).toBe(0)
     })
 
-    test.skip('bulkput', async () => {
-      await await MYDB.bulkput([
-        { key: 0, value: 'A' },
-        { key: 1, value: 'B' },
-        { key: 2, value: 'C' },
-        { key: 3, value: 'D' },
-        { key: 4, value: 'E' },
-        { key: 5, value: 'F' },
-        { key: 6, value: 'G' },
-        { key: 7, value: 'H' },
-        { key: 8, value: 'I' },
-        { key: 9, value: 'J' },
-        { key: 10, value: 'J' },
-        { key: 11, value: 'K' },
-        { key: 12, value: 'L' },
-        { key: 13, value: 'M' },
-        { key: 14, value: 'N' },
-        { key: 15, value: 'O' },
-        { key: 16, value: 'P' },
-        { key: 17, value: 'Q' },
-        { key: 18, value: 'R' },
-        { key: 19, value: 'S' },
-        { key: 20, value: 'T' },
-        { key: 21, value: 'U' },
-        { key: 22, value: 'V' },
-        { key: 23, value: 'W' },
-        { key: 24, value: 'X' },
-        { key: 25, value: 'Y' },
-        { key: 26, value: 'Z' }
+    test('bulkput', async () => {
+      await MYDB.bulkput([
+        { key: '0', value: 'A' },
+        { key: '1', value: 'B' },
+        { key: '2', value: 'C' },
+        { key: '3', value: 'D' },
+        { key: '4', value: 'E' },
+        { key: '5', value: 'F' },
+        { key: '6', value: 'G' },
+        { key: '7', value: 'H' },
+        { key: '8', value: 'I' },
+        { key: '9', value: 'J' },
+        { key: '10', value: 'J' },
+        { key: '11', value: 'K' },
+        { key: '12', value: 'L' },
+        { key: '13', value: 'M' },
+        { key: '14', value: 'N' },
+        { key: '15', value: 'O' },
+        { key: '16', value: 'P' },
+        { key: '17', value: 'Q' },
+        { key: '18', value: 'R' },
+        { key: '19', value: 'S' },
+        { key: '20', value: 'T' },
+        { key: '21', value: 'U' },
+        { key: '22', value: 'V' },
+        { key: '23', value: 'W' },
+        { key: '24', value: 'X' },
+        { key: '25', value: 'Y' },
+        { key: '26', value: 'Z' }
       ])
       const r = await MYDB.list()
+      expect(global.fetch).toHaveBeenCalledTimes(0)
       expect(r.keys.length).toBe(27)
     })
 
-    test.skip('bulkdelete', async () => {
-      await MYDB.bulkdelete([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26])
+    test('bulkdelete', async () => {
+      await MYDB.bulkdelete(['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26'])
       const r = await MYDB.list()
+      expect(global.fetch).toHaveBeenCalledTimes(0)
       expect(r.keys.length).toBe(0)
     })
   })
@@ -199,57 +236,62 @@ describe('CrossKV', () => {
 
     test('getWithMetadata', async () => {
       const r = await MYDB.getWithMetadata('TEST', { type: 'json' })
+      expect(global.fetch).toHaveBeenCalledTimes(2)
       expect(r.value).toEqual({ test: true })
       expect(r.metadata).toBe(null)
     })
 
     test('list', async () => {
       const r = await MYDB.list()
+      expect(global.fetch).toHaveBeenCalledTimes(1)
       expect(r.keys.length).toBe(1)
       expect(r.keys[0].name).toBe('TEST')
     })
 
     test('delete', async () => {
       await MYDB.delete('TEST')
+      expect(global.fetch).toHaveBeenCalledTimes(1)
     })
 
-    test.skip('bulkput', async () => {
-      await await MYDB.bulkput([
-        { key: 0, value: 'A' },
-        { key: 1, value: 'B' },
-        { key: 2, value: 'C' },
-        { key: 3, value: 'D' },
-        { key: 4, value: 'E' },
-        { key: 5, value: 'F' },
-        { key: 6, value: 'G' },
-        { key: 7, value: 'H' },
-        { key: 8, value: 'I' },
-        { key: 9, value: 'J' },
-        { key: 10, value: 'J' },
-        { key: 11, value: 'K' },
-        { key: 12, value: 'L' },
-        { key: 13, value: 'M' },
-        { key: 14, value: 'N' },
-        { key: 15, value: 'O' },
-        { key: 16, value: 'P' },
-        { key: 17, value: 'Q' },
-        { key: 18, value: 'R' },
-        { key: 19, value: 'S' },
-        { key: 20, value: 'T' },
-        { key: 21, value: 'U' },
-        { key: 22, value: 'V' },
-        { key: 23, value: 'W' },
-        { key: 24, value: 'X' },
-        { key: 25, value: 'Y' },
-        { key: 26, value: 'Z' }
+    test('bulkput', async () => {
+      await MYDB.bulkput([
+        { key: '0', value: 'A' },
+        { key: '1', value: 'B' },
+        { key: '2', value: 'C' },
+        { key: '3', value: 'D' },
+        { key: '4', value: 'E' },
+        { key: '5', value: 'F' },
+        { key: '6', value: 'G' },
+        { key: '7', value: 'H' },
+        { key: '8', value: 'I' },
+        { key: '9', value: 'J' },
+        { key: '10', value: 'J' },
+        { key: '11', value: 'K' },
+        { key: '12', value: 'L' },
+        { key: '13', value: 'M' },
+        { key: '14', value: 'N' },
+        { key: '15', value: 'O' },
+        { key: '16', value: 'P' },
+        { key: '17', value: 'Q' },
+        { key: '18', value: 'R' },
+        { key: '19', value: 'S' },
+        { key: '20', value: 'T' },
+        { key: '21', value: 'U' },
+        { key: '22', value: 'V' },
+        { key: '23', value: 'W' },
+        { key: '24', value: 'X' },
+        { key: '25', value: 'Y' },
+        { key: '26', value: 'Z' }
       ])
       const r = await MYDB.list()
+      expect(global.fetch).toHaveBeenCalledTimes(2)
       expect(r.keys.length).toBe(27)
     })
 
-    test.skip('bulkdelete', async () => {
-      await MYDB.bulkdelete([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26])
+    test('bulkdelete', async () => {
+      await MYDB.bulkdelete(['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26'])
       const r = await MYDB.list()
+      expect(global.fetch).toHaveBeenCalledTimes(2)
       expect(r.keys.length).toBe(0)
     })
   })

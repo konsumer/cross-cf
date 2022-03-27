@@ -55,7 +55,7 @@ export class CrossKV {
 
       // this makes API match, but just calls regular function for each
       this.bulkdelete = (keys, paramsAll = {}) => Promise.all(keys.map(id => this.delete(id, paramsAll)))
-      this.bulkput = (records, paramsAll = {}) => Promise.all(records.map(({ key, value }) => this.put(key, value, paramsAll)))
+      this.bulkput = (records, paramsAll = {}) => Promise.all(records.map(({ key, value, ...params }) => this.put(key, value, { ...paramsAll, ...params })))
     }
   }
 
@@ -109,9 +109,9 @@ export class CrossKV {
 
   // do a bulk put (for better efficientcy, up to 10,000)
   // https://api.cloudflare.com/#workers-kv-namespace-write-multiple-key-value-pairs
-  bulkput (records, paramsAll = {}) {
+  async bulkput (records, paramsAll = {}) {
     const o = new URLSearchParams(paramsAll).toString()
-    return this.api(`/storage/kv/namespaces/${this.options.kvID}/bulk?${o}`, 'PUT', {
+    await this.api(`/storage/kv/namespaces/${this.options.kvID}/bulk?${o}`, 'PUT', {
       body: JSON.stringify(records),
       headers: {
         'Content-Type': 'application/json'
@@ -121,9 +121,14 @@ export class CrossKV {
 
   // do a bulk delete (for better efficientcy, up to 10,000)
   // https://api.cloudflare.com/#workers-kv-namespace-delete-multiple-key-value-pairs
-  bulkdelete (keys, paramsAll = {}) {
+  async bulkdelete (keys, paramsAll = {}) {
     const o = new URLSearchParams(paramsAll).toString()
-    return this.api(`/storage/kv/namespaces/${this.options.kvID}/bulk?${o}`, 'DELETE', { body: JSON.stringify(keys) }).then(r => r.json())
+    await this.api(`/storage/kv/namespaces/${this.options.kvID}/bulk?${o}`, 'DELETE', {
+      body: JSON.stringify(keys),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }).then(r => r.json())
   }
 
   // call CF API: https://api.cloudflare.com/

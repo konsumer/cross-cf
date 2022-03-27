@@ -101,40 +101,40 @@ const MYDB2 = new CrossKV('MYDB', { target: 'cf', env})
 
 > **WARNING** These are not part of the original KV API
 
-2 common needs when hitting remote data are bulk `put` and `delete`, so I added that to the API for all `target`s`, too. If you use it on non-remote, it will just call the corresponding single function on each record.
+2 common needs when hitting remote data are bulk `put` and `delete`, so I added that to the API for all `target`s`, too. If you use it on non-remote, it will just call the corresponding single function on each record. Your `key` and `value` must both be strings.
 
 ```js
 await MYDB.bulkput([
-  { key: 0, value: 'A' },
-  { key: 1, value: 'B' },
-  { key: 2, value: 'C' },
-  { key: 3, value: 'D' },
-  { key: 4, value: 'E' },
-  { key: 5, value: 'F' },
-  { key: 6, value: 'G' },
-  { key: 7, value: 'H' },
-  { key: 8, value: 'I' },
-  { key: 9, value: 'J' },
-  { key: 10, value: 'J' },
-  { key: 11, value: 'K' },
-  { key: 12, value: 'L' },
-  { key: 13, value: 'M' },
-  { key: 14, value: 'N' },
-  { key: 15, value: 'O' },
-  { key: 16, value: 'P' },
-  { key: 17, value: 'Q' },
-  { key: 18, value: 'R' },
-  { key: 19, value: 'S' },
-  { key: 20, value: 'T' },
-  { key: 21, value: 'U' },
-  { key: 22, value: 'V' },
-  { key: 23, value: 'W' },
-  { key: 24, value: 'X' },
-  { key: 25, value: 'Y' },
-  { key: 26, value: 'Z' },
+  { key: '0', value: 'A' },
+  { key: '1', value: 'B' },
+  { key: '2', value: 'C' },
+  { key: '3', value: 'D' },
+  { key: '4', value: 'E' },
+  { key: '5', value: 'F' },
+  { key: '6', value: 'G' },
+  { key: '7', value: 'H' },
+  { key: '8', value: 'I' },
+  { key: '9', value: 'J' },
+  { key: '10', value: 'J' },
+  { key: '11', value: 'K' },
+  { key: '12', value: 'L' },
+  { key: '13', value: 'M' },
+  { key: '14', value: 'N' },
+  { key: '15', value: 'O' },
+  { key: '16', value: 'P' },
+  { key: '17', value: 'Q' },
+  { key: '18', value: 'R' },
+  { key: '19', value: 'S' },
+  { key: '20', value: 'T' },
+  { key: '21', value: 'U' },
+  { key: '22', value: 'V' },
+  { key: '23', value: 'W' },
+  { key: '24', value: 'X' },
+  { key: '25', value: 'Y' },
+  { key: '26', value: 'Z' }
 ])
 
-await MYDB.bulkdelete([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26])
+await MYDB.bulkdelete(['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26'])
 ```
 
 
