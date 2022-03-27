@@ -7,7 +7,7 @@ import realFetch from 'cross-fetch'
 const testKV = '0caac01eaf724a108c78075288ceddc2'
 
 // this illustrates how you can hit a real service for integration-tests, or mock for fast network-free unit-tests
-// my remote KV integration test is using a local CrossKV
+// my remote KV unit-tests are using a local CrossKV
 if (process.env.TEST_MODE !== 'integration') {
   const TESTDB = new CrossKV('TESTDB', { target: 'local' })
 
