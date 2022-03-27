@@ -232,8 +232,8 @@ async function main() {
   // works just like CF DOs
   const pokemon = POKEMON.get(POKEMON.idFromName('test'))
   
-  // on real DO, first arg should be user-request or new Request(new URL('YOUR_URL')) if you are in a cron-job or whatever. It will be ignored here.
-  const pokemon = await pokemon.fetch(undefined, { headers: { 'content-type': 'application/json', body: JSON.stringify({ query: DEMO_QUERY }) } })
+  // on real DO, first arg should be user-request or new Request(new URL('YOUR_URL')) if you are in a cron-job or whatever. It will be ignored here, but I use same format as I would use in a cron-job.
+  const pokemon = await pokemon.fetch(new Request(new URL('https://pokemon.name.workers.dev')), { headers: { 'content-type': 'application/json', body: JSON.stringify({ query: DEMO_QUERY }) } })
 }
 main()
 ```
