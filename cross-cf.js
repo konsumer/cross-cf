@@ -1,6 +1,9 @@
 #!/usr/bin/env npx -y esno
 
-// this will let you mess with KV in different environments
+// this will let you mess with KV & DO in different environments
+
+// I use a global, so it's easier to mock in unit-tests, in ES6
+/* global fetch */
 
 import path from 'path'
 import { KVNamespace } from '@miniflare/kv'
@@ -18,13 +21,12 @@ function requiredOptions (needs, options) {
 export class CrossKV {
   constructor (name, options = {}) {
     // these are default env-vars
-    const { CF_EMAIL, CF_TOKEN, CF_ACCOUNTID } = (process?.env || {})
+    const { CF_TOKEN, CF_ACCOUNTID } = (process?.env || {})
 
     this.options = {
       ...options,
       target: options.target || 'local',
       filepath: path.resolve(options.filepath || './.mf/kv', name),
-      accountEmail: options.accountEmail || CF_EMAIL,
       accountToken: options.accountToken || CF_TOKEN,
       accountID: options.accountID || CF_ACCOUNTID,
       env: options.env || {},
@@ -40,7 +42,7 @@ export class CrossKV {
         throw new Error(`You chose "cf" for target, but env does not have "${name}" KV.`)
       }
     } else if (this.options.target === 'remote') {
-      requiredOptions(['kvID', 'accountEmail', 'accountToken', 'accountID'], this.options)
+      requiredOptions(['kvID', 'accountToken', 'accountID'], this.options)
     }
 
     // bind all the methods to this object, if there is a db setup (miniflare or real)
@@ -50,41 +52,72 @@ export class CrossKV {
       this.list = this._db.list.bind(this._db)
       this.put = this._db.put.bind(this._db)
       this.delete = this._db.delete.bind(this._db)
+
+      // this makes API match, but just calls regular function for each
+      this.bulkdelete = (keys, paramsAll = {}) => {}
     }
   }
 
-  // TODO: below here is implementations that hits remote KV
+  // below here is implementations that hits remote KV
 
-  async get (id, options) {
-    return this.api(`/storage/kv/namespaces/${this.options.kvID}/values/${id}`)
+  async get (id, paramsAll = {}) {
+    const { type, ...params } = paramsAll
+    const o = new URLSearchParams(params).toString()
+
+    const r = await this.api(`/storage/kv/namespaces/${this.options.kvID}/values/${id}?${o}`)
+    if (type === 'json') {
+      return r.json()
+    } else if (type === 'arrayBuffer') {
+      r.arrayBuffer()
+    } else if (type === 'stream') {
+      const reader = r.body.getReader()
+      return reader
+    } else {
+      return r.text()
+    }
   }
 
-  async getWithMetadata (id, options) {}
+  async getWithMetadata (id, paramsAll = {}) {
+    const value = await this.get(id, paramsAll)
+    const m = await this.api(`/storage/kv/namespaces/${this.options.kvID}/metadata/${id}`).then(r => r.json())
+    return { value, metadata: m.result }
+  }
 
-  async list (options) {}
+  async list (paramsAll = {}) {
+    // TODO: look into cursor
+    const o = new URLSearchParams(paramsAll).toString()
+    const r = await this.api(`/storage/kv/namespaces/${this.options.kvID}/keys?${o}`).then(r => r.json())
+    return {
+      keys: r.result,
+      cursor: r.result_info.cursor,
+      list_complete: r.result.length === r.result_info.count
+    }
+  }
 
-  async put (id, value, options) {}
+  put (id, value, paramsAll = {}) {
+    const o = new URLSearchParams(paramsAll).toString()
+    return this.api(`/storage/kv/namespaces/${this.options.kvID}/values/${id}?${o}`, 'PUT', { body: value }).then(r => r.json())
+  }
 
-  async delete (id, options) {}
+  delete (id, paramsAll = {}) {
+    const o = new URLSearchParams(paramsAll).toString()
+    return this.api(`/storage/kv/namespaces/${this.options.kvID}/values/${id}?${o}`, 'DELETE').then(r => r.json())
+  }
 
   // below here are some extra functions you are free to use, but they are not part of KV
 
   // call CF API: https://api.cloudflare.com/
   // UNDOCUMENTED
-  api (endpoint, method = 'GET', options = {}) {
-    const { headers = {}, body, ...fetchOptions } = options
-    if (body) {
-      fetchOptions.body = JSON.stringify(body)
-    }
+  api (endpoint, method = 'GET', paramsAll = {}) {
+    const { headers = {}, body, ...fetchOptions } = paramsAll
     return fetch(`https://api.cloudflare.com/client/v4/accounts/${this.options.accountID}${endpoint}`, {
       headers: {
-        'X-Auth-Email': this.options.accountEmail,
-        'X-Auth-Key': this.options.accountToken,
-        'Content-Type': 'application/json',
-        Accepts: 'application/json',
+        Authorization: `Bearer ${this.options.accountToken}`,
         ...headers
       },
-      ...fetchOptions
+      ...fetchOptions,
+      method,
+      body
     })
       .then(r => {
         if (r.status !== 200) {
@@ -92,19 +125,31 @@ export class CrossKV {
         }
         return r
       })
-      .then(r => r.json())
   }
 
-  // get list of available KV namespaces
+  // do a bulk put (for better efficientcy, up to 10,000)
+  // https://api.cloudflare.com/#workers-kv-namespace-write-multiple-key-value-pairs
   // UNDOCUMENTED
-  namespaces () {
-    return this.api('/storage/kv/namespaces')
+  bulkput (records, paramsAll = {}) {
+
+  }
+
+  // do a bulk delete (for better efficientcy, up to 10,000)
+  // https://api.cloudflare.com/#workers-kv-namespace-delete-multiple-key-value-pairs
+  // UNDOCUMENTED
+  bulkdelete (keys, paramsAll = {}) {
   }
 }
 
 export class CrossDO {
   constructor (url) {
     this.url = url
+
+    // use the real one, if it's provided
+    if (typeof url === 'object') {
+      this.get = url.get.bind(url)
+      this.idFromName = url.idFromName.bind(url)
+    }
   }
 
   get (id) {

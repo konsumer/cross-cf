@@ -7,12 +7,11 @@
   "scripts": {
     "build": "npx -y esbuild --outfile=worker.js src/worker.js",
     "deploy": "npx -y @cloudflare/wrangler deploy",
-    "start": "npx -y @cloudflare/wrangler dev"
+    "start": "npx -y miniflare"
   },
   "keywords": [],
   "author": "David Konsumer <konsumer@jetboystudio.com> (http://konsumer.js.org/)",
   "license": "MIT",
   "dependencies": {
-    "@cloudflare/wrangler": "^1.19.11"
   }
 }
