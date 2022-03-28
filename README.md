@@ -35,9 +35,9 @@ import { CrossKV } from 'cross-cf'
 
 const MYDB = new CrossKV('MYDB')
 
-await MYDB.put('coolA', { cool: true }, { type: 'json' })
-await MYDB.put('coolB', { cool: true }, { type: 'json' })
-await MYDB.put('coolB', { cool: true }, { type: 'json' })
+await MYDB.put('coolA', JSON.stringify({ cool: true }))
+await MYDB.put('coolB', JSON.stringify({ cool: true }))
+await MYDB.put('coolB', JSON.stringify({ cool: true }))
 
 console.log(await MYDB.list())
 
