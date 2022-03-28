@@ -95,7 +95,7 @@ const MYDB2 = new CrossKV('MYDB', { target: 'cf', env})
 
 > **WARNING** These are not part of the original KV API
 
-2 common needs when hitting remote data are bulk `put` and `delete`, so I added that to the API for all `target`s`, too. If you use it on non-remote, it will just call the corresponding single function on each record. Your `key` and `value` must both be strings.
+2 common needs when hitting remote data are bulk `put` and `delete`, so I added that to the API for all `target`s, too. If you use it on non-remote, it will just call the corresponding single function on each record. Your `key` and `value` must both be strings.
 
 ```js
 await MYDB.bulkput([
