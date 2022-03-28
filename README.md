@@ -5,7 +5,7 @@ Cross-environment Cloudflare [DO](https://developers.cloudflare.com/workers/runt
 
 I kept needing to inject things into my local (miniflare) or remote KV, or interact with my DO, in scripts or unit-tests that run in node. This lets you mess with them directly, and it keeps the same API in all environments.
 
-You can chack out the [example](/example/) for an idea of how to use it in your own thing. Basically, I have a graphql endpoint worker that I want to be able to migrate data to/from and run unit-tests on it locally.
+You can chack out the [example](https://github.com/konsumer/cross-cf/blob/main/example) for an idea of how to use it in your own thing. Basically, I have a graphql endpoint worker that I want to be able to migrate data to/from and run unit-tests on it locally.
 
 
 ## installation
@@ -259,7 +259,7 @@ You may ask yourself "Why should I do this instead of just using a regular `fetc
 
 ### testing
 
-One handy side-effect of this stuff is you will get an interface that works the same as the real thing, but can do remote requests, that you can mock (like with [jest](https://jestjs.io/docs/mock-functions)) and then make your code do stuff. You can mock `cross-fetch` module or global fetch for remote requests (and make them local calls you can look at), or just mock the interface directly. For my stuff, I like unit-tests that could run on the real DO if I set it up (for instant integration tests.) It's also handy if you are copy/pasting text from some worker-code. See [test.js](test.js) for some examples. You can look at [example/](example) for an example worker project.
+One handy side-effect of this stuff is you will get an interface that works the same as the real thing, but can do remote requests, that you can mock (like with [jest](https://jestjs.io/docs/mock-functions)) and then make your code do stuff. You can mock `cross-fetch` module or global fetch for remote requests (and make them local calls you can look at), or just mock the interface directly. For my stuff, I like unit-tests that could run on the real DO if I set it up (for instant integration tests.) It's also handy if you are copy/pasting text from some worker-code. See [test.js](https://github.com/konsumer/cross-cf/blob/main/test.js) for some examples. You can look at [example/](https://github.com/konsumer/cross-cf/blob/main/example) for an example worker project.
 
 
 ## todo
