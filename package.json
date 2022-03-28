@@ -16,7 +16,7 @@
     "pretest": "npx -y esbuild --bundle --platform=node --format=cjs --outfile=./dist/test.js test.js",
     "test": "npx -y jest --verbose=true ./dist/test.js",
     "integration": "TEST_MODE=integration npm run test",
-    "prePublishOnly": "npm run build"
+    "prepublishOnly": "npm run build"
   },
   "keywords": [
     "cloudflare",
