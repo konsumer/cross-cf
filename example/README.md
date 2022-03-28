@@ -2,6 +2,8 @@ This is an example worker/DO project that you can use with the remote-DO/KV stuf
 
 Additionally, I track remote KV I use, for testing cross-cf's remote KV handling. You will need to set all your own IDs in wrangler.toml.
 
+My worker is deployed [here](https://do-example.dkonsumer-gummicube.workers.dev/).
+
 The features of this demo-project are:
 
 - a graphql server that runs on CF edge-worker
@@ -24,9 +26,9 @@ npm run migrate:tolocal   # copy remote database into local
 npm run migrate:toremote  # copy local database into remote
 ```
 
-This has been adapted from [graphql-pokemon](https://github.com/lucasbento/graphql-pokemon). I could have just run directly off the JSON file, but I wanted to make an example of using KV, so I insert all records into KV:
+This has been adapted & improved, originally from [graphql-pokemon](https://github.com/lucasbento/graphql-pokemon). I could have just run directly off the JSON file, but I wanted to make a demo of using KV, so I insert all records into KV:
 
 ```
 npm run mock
-npm run migrate:toremot
+npm run migrate:toremote
 ```

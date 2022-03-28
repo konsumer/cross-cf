@@ -1,12 +1,20 @@
 name = 'do-example'
+compatibility_date = "2022-01-31"
 account_id = '3ed2457d27afff741ff0aef6c76365fa'
 workers_dev = true
 
+[build]
+command = "npm run build"
+
 [[kv_namespaces]]
 binding = 'MYDB'
-id = '0caac01eaf724a108c78075288ceddc2'
-preview_id = '0caac01eaf724a108c78075288ceddc2'
+id = 'a7ce7f866d344d1d9757ac8f69bcab7f'
+preview_id = 'a7ce7f866d344d1d9757ac8f69bcab7f'
 
 [[durable_objects.bindings]]
 name = 'POKEMON'
 class_name = 'PokemonDurableObject'
+
+[[migrations]]
+tag = "v1"
+new_classes = ["PokemonDurableObject"]

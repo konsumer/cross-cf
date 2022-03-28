@@ -4,22 +4,28 @@
   "type": "module",
   "version": "0.0.0",
   "description": "This is an example worker/DO project that you can use with the remote-DO stuff.",
-  "main": "worker.js",
+  "main": "dist/worker.js",
   "scripts": {
-    "build": "npx -y esbuild --outfile=worker.js src/worker.js",
-    "deploy": "npx -y @cloudflare/wrangler deploy",
-    "start": "npx -y miniflare --persist-kv",
+    "build": "node build.js",
+    "deploy": "wrangler publish dist/worker.js",
+    "predeploy": "npm run build",
+    "prestart": "npm run build",
+    "start": "wrangler dev dist/worker.js",
     "mock": "NODE_OPTIONS='--no-warnings' node src/mock.js",
-    "migrate:toremote": "cross-cf MYDB 'local:.mf/kv' 'remote:0caac01eaf724a108c78075288ceddc2'",
-    "migrate:tolocal": "cross-cf MYDB remote:0caac01eaf724a108c78075288ceddc2 local:.mf/kv"
+    "migrate:toremote": "cross-cf MYDB 'local:.mf/kv' 'remote:a7ce7f866d344d1d9757ac8f69bcab7f'",
+    "migrate:tolocal": "cross-cf MYDB 'remote:a7ce7f866d344d1d9757ac8f69bcab7f' 'local:.mf/kv'"
   },
   "keywords": [],
   "author": "David Konsumer <konsumer@jetboystudio.com> (http://konsumer.js.org/)",
   "license": "MIT",
   "devDependencies": {
-    "toml": "^3.0.0"
+    "esbuild": "^0.14.28",
+    "esbuild-node-builtins": "^0.1.0",
+    "toml": "^3.0.0",
+    "wrangler": "^0.0.0-7d4ea43"
   },
   "dependencies": {
+    "@graphql-tools/schema": "^8.3.5",
     "cross-cf": "file:.."
   }
 }

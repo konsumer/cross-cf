@@ -4,7 +4,7 @@ import { CrossKV, CrossDO } from './cross-cf.js'
 import realFetch from 'cross-fetch'
 
 // set this to your own
-const testKV = '0caac01eaf724a108c78075288ceddc2'
+const testKV = 'a7ce7f866d344d1d9757ac8f69bcab7f'
 
 // this illustrates how you can hit a real service for integration-tests, or mock for fast network-free unit-tests
 // my remote KV unit-tests are using a local CrossKV
@@ -301,4 +301,22 @@ describe('CrossDO', () => {
   test('has tests', () => {
     expect(1 + 1).toBe(2)
   })
+
+  // this test will only work on integration
+  if (process.env.TEST_MODE === 'integration') {
+    test('get pokemon from remote', async () => {
+      const POKEMON = new CrossDO('https://do-example.dkonsumer-gummicube.workers.dev/')
+      const query = `
+      {
+        pokemons {
+          name
+        }
+      }
+      `
+      const pokemon = POKEMON.get(POKEMON.idFromName('TEST'))
+      const r = await pokemon.fetch(undefined, { method: 'POST', type: 'application/json', body: JSON.stringify({ query }) })
+      expect(global.fetch).toHaveBeenCalledTimes(1)
+      console.log(r)
+    })
+  }
 })
