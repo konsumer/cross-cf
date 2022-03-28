@@ -1,6 +1,6 @@
 {
   "name": "cross-cf",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Cross-environment DO and KV access",
   "type": "module",
   "source": "cross-cf.js",
@@ -28,8 +28,8 @@
   "author": "David Konsumer <konsumer@jetboystudio.com>",
   "homepage": "https://github.com/konsumer/cross-cf#readme",
   "bugs": {
-    "url" : "https://github.com/konsumer/cross-cf/issues",
-    "email" : "konsumer@jetboystudio.com"
+    "url": "https://github.com/konsumer/cross-cf/issues",
+    "email": "konsumer@jetboystudio.com"
   },
   "repository": "konsumer/cross-cf",
   "license": "MIT",
