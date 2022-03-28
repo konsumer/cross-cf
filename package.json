@@ -26,6 +26,12 @@
     "object"
   ],
   "author": "David Konsumer <konsumer@jetboystudio.com>",
+  "homepage": "https://github.com/konsumer/cross-cf#readme",
+  "bugs": {
+    "url" : "https://github.com/konsumer/cross-cf/issues",
+    "email" : "konsumer@jetboystudio.com"
+  },
+  "repository": "konsumer/cross-cf",
   "license": "MIT",
   "dependencies": {
     "@miniflare/kv": "^2.3.0",

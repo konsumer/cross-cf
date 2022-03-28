@@ -1,11 +1,12 @@
 #!/usr/bin/env node
 
+const { basename } = require('path')
 global.fetch = require('cross-fetch')
 const { CrossKV } = require('.')
 
 const [, progname, name, from, to] = process.argv
 if (!name || !from || !to) {
-  console.error(`Usage: ${progname} NAME FROM:LOCATION TO:LOCATION`)
+  console.error(`Usage: ${basename(progname)} NAME FROM:LOCATION TO:LOCATION`)
   console.error('')
   console.error('\tWhere targets look like "local:dir" or "remote:kvID"')
   console.error('')
