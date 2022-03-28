@@ -1,7 +1,5 @@
 # cross-cf
 
-> **WIP**: I am still working on this. It's not really usable right now.
-
 
 Cross-environment Cloudflare [DO](https://developers.cloudflare.com/workers/runtime-apis/durable-objects/) and [KV](https://developers.cloudflare.com/workers/runtime-apis/kv) access.
 
@@ -18,8 +16,6 @@ npm i -D cross-cf
 
 ## usage
 
-<!--
-
 ### CLI
 
 Included is a CLI you can use to migrate KV, since it's such a useful task. Get help like this:
@@ -27,8 +23,6 @@ Included is a CLI you can use to migrate KV, since it's such a useful task. Get 
 ```sh
 npx cross-cf
 ```
-
--->
 
 ### KV
 
@@ -169,7 +163,6 @@ To go the other way, `bulkput` is probly a better choice for performance. Since 
 ```js
 import { CrossKV } from 'cross-cf'
 
-// handle CLI arguments
 const [, progname, name, from, to] = process.argv
 if (!name || !from || !to) {
   console.error(`Usage: ${progname} NAME FROM:LOCATION TO:LOCATION`)
@@ -182,30 +175,25 @@ if (!name || !from || !to) {
 }
 
 const [fromTarget, fromPath] = from.split(':')
-const [toTarget, toPath] = from.split(':')
+const [toTarget, toPath] = to.split(':')
 
 const db = {
-  local: toTarget === 'local' ? new CrossKV(name, { filepath: toPath }) : new CrossKV(name, { target: remote, kvId: toPath }),
-  remote: fromTarget === 'local' ? new CrossKV(name, { filepath: fromPath }) : new CrossKV(name, { target: remote, kvId: fromPath })
+  local: toTarget === 'local' ? new CrossKV(name, { filepath: toPath }) : new CrossKV(name, { target: 'remote', kvID: toPath }),
+  remote: fromTarget === 'local' ? new CrossKV(name, { filepath: fromPath }) : new CrossKV(name, { target: 'remote', kvID: fromPath })
 }
 
-async function main() {
-  const records = []
+async function main () {
   const { keys } = await db.remote.list()
-  const records = await Promise.all(keys.map(async ({name}) => {
+  const records = await Promise.all(keys.map(async ({ name }) => {
     const value = await db.remote.get(name)
-    return { kay: name,  value }
+    return { key: name, value }
   }))
   await db.local.bulkput(records)
 }
 main()
 ```
 
-<!--
-
 This is very similar to the CLI I include.
-
--->
 
 ### DO
 
@@ -279,4 +267,3 @@ One handy side-effect of this stuff is you will get an interface that works the 
 - read wrangler.toml for named KV, and use less config (ids, etc)
 - allow lookup (from remote) of KV by name (not ID)
 - put throttling limits and fail-recovery into API stuff
-- add CLI to npm publish (for migrating KV)

@@ -42,6 +42,9 @@
     "dist/cross-cf.umd.js",
     "dist/cross-cf.umd.js.map"
   ],
+  "bin": {
+    "cross-cf": "./cli.cjs"
+  },
   "devDependencies": {
     "wrangler": "^0.0.4"
   }

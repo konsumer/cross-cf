@@ -1,17 +1,25 @@
 {
   "name": "do-example",
   "private": true,
+  "type": "module",
   "version": "0.0.0",
   "description": "This is an example worker/DO project that you can use with the remote-DO stuff.",
   "main": "worker.js",
   "scripts": {
     "build": "npx -y esbuild --outfile=worker.js src/worker.js",
     "deploy": "npx -y @cloudflare/wrangler deploy",
-    "start": "npx -y miniflare"
+    "start": "npx -y miniflare --persist-kv",
+    "mock": "NODE_OPTIONS='--no-warnings' node src/mock.js",
+    "migrate:toremote": "cross-cf MYDB 'local:.mf/kv' 'remote:0caac01eaf724a108c78075288ceddc2'",
+    "migrate:tolocal": "cross-cf MYDB remote:0caac01eaf724a108c78075288ceddc2 local:.mf/kv"
   },
   "keywords": [],
   "author": "David Konsumer <konsumer@jetboystudio.com> (http://konsumer.js.org/)",
   "license": "MIT",
+  "devDependencies": {
+    "toml": "^3.0.0"
+  },
   "dependencies": {
+    "cross-cf": "file:.."
   }
 }

@@ -1,6 +1,36 @@
 /* global Response */
 
-export class PokemonDurableObject {}
+import { getClient } from './schema.js'
+import playground from './playground.html'
+
+// let everyone request from this in a browser or whatever
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET,HEAD,POST,OPTIONS',
+  'Access-Control-Max-Age': '86400',
+  'Access-Control-Allow-Headers': 'Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers'
+}
+
+export class PokemonDurableObject {
+  constructor (state, env) {
+    this.state = state
+    this.env = env
+    this.state.blockConcurrencyWhile(async () => {
+      this.q = await getClient({ env, state })
+    })
+  }
+
+  async fetch (request) {
+    const { query, variables } = await request.json()
+    const r = await this.q(query, variables)
+    return new Response(JSON.stringify(r), {
+      headers: {
+        'content-type': 'application/json',
+        ...corsHeaders
+      }
+    })
+  }
+}
 
 export default {
   async fetch (request, env) {
@@ -14,9 +44,10 @@ export default {
       return pokemon.fetch(request)
     }
 
-    return new Response('<h1>Nothing to see here.</h1>', {
+    return new Response(playground, {
       headers: {
-        'content-type': 'text/html'
+        'content-type': 'text/html',
+        ...corsHeaders
       }
     })
   }
