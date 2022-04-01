@@ -65,7 +65,7 @@ CF_ACCOUNTID  # your worker's accountID
 ```
 
 ```js
-const MYDB = new CrossKV('MYDB', { target: 'remote', kvId: 'XXX' })
+const MYDB = new CrossKV('MYDB', { target: 'remote', kvID: 'XXX' })
 ```
 
 You can also setup auth, directly:
