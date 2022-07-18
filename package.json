@@ -1,6 +1,6 @@
 {
   "name": "cross-cf",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "Cross-environment DO and KV access",
   "type": "module",
   "source": "cross-cf.js",
