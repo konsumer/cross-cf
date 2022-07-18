@@ -21,13 +21,13 @@ function requiredOptions (needs, options) {
 export class CrossKV {
   constructor (name, options = {}) {
     // these are default env-vars
-    const { CF_TOKEN, CF_ACCOUNTID } = (process?.env || {})
+    const { CF_TOKEN, CF_ACCOUNTID, CLOUDFLARE_TOKEN } = (process?.env || {})
 
     this.options = {
       ...options,
       target: options.target || 'local',
       filepath: path.resolve(options.filepath || './.mf/kv', name),
-      accountToken: options.accountToken || CF_TOKEN,
+      accountToken: options.accountToken || CF_TOKEN || CLOUDFLARE_TOKEN,
       accountID: options.accountID || CF_ACCOUNTID,
       env: options.env || {},
       name
