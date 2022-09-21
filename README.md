@@ -24,6 +24,16 @@ Included is a CLI you can use to migrate KV, since it's such a useful task. Get 
 npx cross-cf
 ```
 
+For remote-operations (remote KV, DO, etc) you will need a global `fetch`. New versions of node have it built-in. You can add to older versions of node with code like this:
+
+```js
+import fetch from 'cross-fetch'
+
+globalThis.fetch = fetch
+```
+
+You can also exploit this to mock `fetch` in unit-tests, with things like [msw](https://mswjs.io/).
+
 ### KV
 
 KV can be used remotely (if you have an API key and the ID of the KV) or locally (using miniflare filesystem, directly.)
@@ -81,7 +91,7 @@ const MYDB = new CrossKV('MYDB', {
 
 #### memory
 
-This can be handy for unit-tests, where you don't want to persist anything, but you want the same API.
+This can be handy for unit-tests, where you don't want to persist anything, but you want the same API. Personally, I use this for my unit-tests, so any existing data in the persistant `local` setup doesn't effect my tests.
 
 ```js
 const MYDB = new CrossKV('MYDB', { target: 'memory' })
