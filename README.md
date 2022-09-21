@@ -79,6 +79,14 @@ const MYDB = new CrossKV('MYDB', {
 })
 ```
 
+#### memory
+
+This can be handy for unit-tests, where you don't want to persist anything, but you want the same API.
+
+```js
+const MYDB = new CrossKV('MYDB', { target: 'memory' })
+```
+
 #### cf
 
 This `target` means that you want to use KV from actual cloudflare (or inside miniflare.) I'm not totally sure what the usecase is, but this will let you keep your code more similar in different environments, which is the overall goal of this library.

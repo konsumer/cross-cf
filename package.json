@@ -35,8 +35,7 @@
   "license": "MIT",
   "dependencies": {
     "@miniflare/kv": "^2.3.0",
-    "@miniflare/storage-file": "^2.3.0",
-    "cross-fetch": "^3.1.5"
+    "@miniflare/storage-file": "^2.3.0"
   },
   "files": [
     "dist/cross-cf.cjs",
@@ -52,6 +51,7 @@
     "cross-cf": "./cli.cjs"
   },
   "devDependencies": {
+    "cross-fetch": "^3.1.5",
     "wrangler": "^0.0.4"
   }
 }

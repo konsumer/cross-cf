@@ -8,7 +8,7 @@
 import path from 'path'
 import { KVNamespace } from '@miniflare/kv'
 import { FileStorage } from '@miniflare/storage-file'
-import 'cross-fetch'
+import { MemoryStorage } from '@miniflare/storage-memory'
 
 function requiredOptions (needs, options) {
   for (const o of needs) {
@@ -43,6 +43,8 @@ export class CrossKV {
       }
     } else if (this.options.target === 'remote') {
       requiredOptions(['kvID', 'accountToken', 'accountID'], this.options)
+    } else if (this.options.target === 'memory') {
+      this._db = new KVNamespace(new MemoryStorage())
     }
 
     // bind all the methods to this object, if there is a db setup (miniflare or real)
